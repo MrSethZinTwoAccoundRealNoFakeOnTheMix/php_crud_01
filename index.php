@@ -14,5 +14,6 @@
   <a href="dataTable.php" class="underline text-blue-500">View data</a>
   <a href="register.php" class="underline text-blue-500">Register</a>
   <a href="login.php" class="underline text-blue-500">Login</a>
+  <a href="dashboard.php" class="underline text-blue-500">Dashboard</a>
 </body>
 </html>

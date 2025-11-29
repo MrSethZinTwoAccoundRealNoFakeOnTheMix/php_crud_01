@@ -19,6 +19,7 @@ $sql = "CREATE TABLE IF NOT EXISTS testdata_2 (
     create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     update_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 )";
+
 // if($conn->query($sql) === TRUE){
 //   echo "table created!";
 // }
