@@ -20,6 +20,18 @@ $sql = "CREATE TABLE IF NOT EXISTS testdata_2 (
     update_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 )";
 
+$sql = "CREATE TABLE IF NOT EXISTS testdata_detail(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    address VARCHAR(255),
+    phone VARCHAR(50),
+    dob DATE,
+    bio TEXT,
+    create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    update_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES testdata_2(id) ON DELETE CASCADE
+)";
+
 // if($conn->query($sql) === TRUE){
 //   echo "table created!";
 // }

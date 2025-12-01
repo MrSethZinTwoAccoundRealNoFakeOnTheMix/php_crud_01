@@ -10,7 +10,7 @@ $old = $_SESSION['old'] ?? [];
 $login_fail = $_SESSION['login_fail'] ?? '';
 
 
-unset($_SESSION['validation'], $_SESSION['username'], $_SESSION['old']);
+unset($_SESSION['validation'], $_SESSION['username'], $_SESSION['old'], $_SESSION['login_fail']);
 
 ?>
 
