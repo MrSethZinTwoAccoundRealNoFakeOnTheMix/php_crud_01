@@ -20,14 +20,15 @@ unset($_SESSION['success'], $_SESSION['pass_fail'], $_SESSION['pass_success']);
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 <body class="flex flex-col justify-center items-center relative">
-  <?php if(!empty($success)): ?>
-    <p class="text-green-500"><?php echo "$success" ?></p>
-  <?php endif;?>
-  <?php if(!empty($pass_fail)){
-    echo "<p class='text-red-500'><?php $pass_fail ?></p>";
-  }
-  ?>
+ 
+  
   <table class="border border-collapse text-center mt-12 ">
+     <?php if(!empty($success)): ?>
+      <p class="text-green-500"><?php echo "$success" ?></p>
+    <?php endif;?>
+    <?php if(!empty($pass_fail)): ?>
+      <p class="text-red-500"><?= $pass_fail ?></p>
+    <?php endif;?>
     <tr class="border border-collapse ">
       <th class="border px-4 py-2">ID</th>
       <th class="border px-4 py-2">Username</th>
@@ -59,7 +60,7 @@ unset($_SESSION['success'], $_SESSION['pass_fail'], $_SESSION['pass_success']);
       <a href="index.php" class="px-4 py-2 rounded-lg bg-amber-300 border-2 border-amber-300 text-black hover:text-white hover:bg-transparent transition duration-300 ease-in-out cursor-pointer">Back</a>
   <!-- Edit form -->
   <div class="overlay hidden h-screen w-full bg-black/30 fixed top-0 items-center justify-center">
-    <form action="action.php" method="post" class="editForm absolute p-8 bg-slate-600 w-[400px] h-[400px] flex flex-col  items-center rounded-xl  ">
+    <form action="action.php" method="post" class="editForm absolute p-8 bg-slate-600 w-[400px] min-h-[400px] flex flex-col  items-center rounded-xl  ">
       <h1 class="text-white text-lg ">Edit item</h1>
       <div class="text-white mt-4 w-full flex justify-between items-center">
         <label for="name">Username:</label>
@@ -77,7 +78,13 @@ unset($_SESSION['success'], $_SESSION['pass_fail'], $_SESSION['pass_success']);
         <label for="name">New Password:</label>
         <input type="text" name="new_password" class="border rounded-lg px-4 py-2" placeholder="Password">
       </div>
-      
+      <div class="text-white mt-4 w-full flex justify-between items-center">
+      <label for="role">Role:</label>
+      <select name="role" id="role" class="border px-12 py-2 rounded-md">
+        <option value="user" class="bg-slate-800 text-white hover:bg-slate-600" selected>User</option>
+        <option value="admin" class="bg-slate-800 text-white hover:bg-slate-600" >Admin</option>
+      </select>
+    </div>
       <div class="text-white mt-4 w-full flex justify-between items-center">
         <button class="backBtn px-4 py-2 rounded-lg bg-amber-300 border-2 border-amber-300 text-black hover:text-white hover:bg-transparent transition duration-300 ease-in-out cursor-pointer">Back</button>
         <input class="px-4 py-2 rounded-lg bg-amber-300 border-2 border-amber-300 text-black hover:text-white hover:bg-transparent transition duration-300 ease-in-out cursor-pointer" type="submit" name="actions" value="Save Edit">

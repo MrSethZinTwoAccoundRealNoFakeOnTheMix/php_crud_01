@@ -6,16 +6,16 @@ require_once "database.php";
 // $username =$_POST['username'];
 // $gmail = $_POST['gmail'];
 // $getId = $_POST['getId'];
-// $inputPass = $_POST['old_password'];
+// $oldPass = $_POST['old_password'];
 // $newPass = $_POST['new_password'];
 
 $actions = $_POST['actions'] ?? '';
 $id = $_POST['getId'] ?? '';
 $username = $_POST['username'] ?? '';
 $gmail = $_POST['gmail'] ?? '';
-$inputPass = $_POST['old_password'] ?? '';
+$oldPass = $_POST['old_password'] ?? '';
 $newPass = $_POST['new_password'] ?? '';
-
+$role = $_POST['role'] ?? '';
 if($actions === 'Delete'){
   $sql = "DELETE FROM testdata_2 WHERE gmail = ?";
   $stmt = $conn->prepare($sql);
@@ -26,27 +26,76 @@ if($actions === 'Delete'){
   exit;
 }
 if($actions === 'Save Edit'){
-  $sql = "SELECT password FROM testdata_2 where id = ?";
-  $stmt = $conn->prepare($sql);
-  $stmt->bind_param('i', $id);
-  $stmt->execute();
-  $stmt->bind_result($hashedPasswordFromDB);
-  $stmt->fetch();
-  $stmt->close();
-  if(password_verify($inputPass, $hashedPasswordFromDB)){
-    $hashedNewPass = password_hash($newPass, PASSWORD_DEFAULT);
-    $sql = "UPDATE testdata_2 SET username = ?, gmail = ?, password = ? WHERE id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param('sssi', $username, $gmail, $hashedNewPass, $id);
-    $stmt->execute();
-    $_SESSION['success'] = "Item edited Successfully!";
-    header("Location: dataTable.php");
-    exit;
-  }else{
-    $_SESSION['pass_fail'] = "Incorrect Password!";
-    header("Location: dataTable.php");
-    exit;
+  //---------create dynamic update if there's no value change nothing-------
+  $fields = [];
+  $params = [];
+  $types = '';
+  if($username !== ''){
+    $fields[] = 'username = ?';
+    $params[] = $username;
+    $types .= 's';
   }
+  if($gmail !== ''){
+    $fields[] = 'gmail = ?';
+    $params[] = $gmail;
+    $types .= 's';
+  }
+  if ($role !== '') {
+    $fields[] = "role = ?";
+    $params[] = $role;
+    $types .= "s";
+  }
+  // if($oldPass !== ''){
+  //   $fields[] = ' = ?';
+  //   $params[] = $username;
+  //   $type .= 's';
+  // }
+  // if($newPass !== ''){
+  //   $fields[] = 'username = ?';
+  //   $params[] = $username;
+  //   $type .= 's';
+  // }
+  
+  if($oldPass !== '' && $newPass !== ''){
+    $sql = "SELECT password FROM testdata_2 WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param('i', $id);
+    $stmt->execute();
+    $stmt->bind_result($hashedPasswordFromDB);
+    $stmt->fetch();
+    $stmt->close();
+    if(password_verify($oldPass, $hashedPasswordFromDB)){
+      $hashedNewPass = password_hash($newPass, PASSWORD_DEFAULT);
+      $fields[] = 'password = ?';
+      $params[] = $hashedNewPass;
+      $types .= 's';
+
+      $sql = "UPDATE testdata_2 SET " . implode(',', $fields) . " WHERE id = ?";
+      $types .= 'i';
+      $fields[] = $id;
+      $stmt = $conn->prepare($sql);
+      $stmt->bind_param($types,...$params);
+      $stmt->execute();
+      $_SESSION['success'] = "Item edited Successfully!";
+      header("Location: dashboard.php");
+      exit;
+    }else{
+      $_SESSION['pass_fail'] = "Incorrect Password! Update failed!";
+      header("Location: dashboard.php");
+      exit;
+    }
+  }
+
+  $sql_no_pass = "UPDATE testdata_2 SET " . implode(',', $fields) . " WHERE id = ?";
+  $types .= 'i';
+  $params[] = $id;
+  $stmt_no_pass = $conn->prepare($sql_no_pass);
+  $stmt_no_pass->bind_param($types, ...$params);
+  $stmt_no_pass->execute();
+  $_SESSION['success'] = "Item edited Successfully!";
+  header("Location: dashboard.php");
+  exit;
+
 }
 
 ?>

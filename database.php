@@ -31,6 +31,10 @@ $sql = "CREATE TABLE IF NOT EXISTS testdata_detail(
     update_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES testdata_2(id) ON DELETE CASCADE
 )";
+//----Alter table add role in testdata_2-----
+// $sql = "ALTER TABLE testdata_2
+//   ADD COLUMN role ENUM('admin','user') NOT NULL DEFAULT 'user' AFTER id";
+
 
 // if($conn->query($sql) === TRUE){
 //   echo "table created!";

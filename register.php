@@ -35,9 +35,9 @@ unset($_SESSION['errors'], $_SESSION['old'], $_SESSION['success']);
       }
     }
     ?>
-    <?php foreach($success as $suc): ?>
+    <!-- <?php foreach($success as $suc): ?>
       <p class="text-green-500"><?= $suc ?></p>
-    <?php endforeach; ?>
+    <?php endforeach; ?> -->
   <?php if($success): ?>
     <p class="text-green-500"><?= $success ?></p>
   <?php endif; ?>
@@ -55,6 +55,13 @@ unset($_SESSION['errors'], $_SESSION['old'], $_SESSION['success']);
       <label for="name">Password:</label>
       <input type="text" name="password" class="border px-4 py-2 rounded-md" placeholder="Username">
     </div>
+    <!-- <div class="flex flex-row items-center justify-between w-full">
+      <label for="role">Role:</label>
+      <select name="role" id="role" class="border px-12 py-2 rounded-md">
+        <option value="user" selected>User</option>
+        <option value="admin">Admin</option>
+      </select>
+    </div> -->
     <div class="flex flex-row items-center justify-between w-full mt-4">
       <!-- <a href="index.php" class="text-amber-300 underline">Go back</a> -->
       <a href="login.php" class="text-amber-300 underline">Already have an account? login</a>

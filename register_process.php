@@ -56,6 +56,7 @@ $stmt_detail = $conn->prepare($sql_detail);
 $stmt_detail->bind_param('i', $new_user_id);
 $stmt_detail->execute();
 
+
 // $success = ["Register successfully!"];
 $_SESSION['success'] = "Register successfully!";
 header("Location: register.php");
