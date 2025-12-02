@@ -4,7 +4,7 @@ session_start();
 
 $username = $_SESSION['old']['username'] ?? '';
 $gmail = $_SESSION['old']['gmail'] ?? '';
-$success = $_SESSION['success'] ?? '';
+$success = $_SESSION['success'] ?? [];
 $errors = $_SESSION['errors'] ?? [];
 $old =  $_SESSION['old'] ?? [];
 
@@ -35,6 +35,9 @@ unset($_SESSION['errors'], $_SESSION['old'], $_SESSION['success']);
       }
     }
     ?>
+    <?php foreach($success as $suc): ?>
+      <p class="text-green-500"><?= $suc ?></p>
+    <?php endforeach; ?>
   <?php if($success): ?>
     <p class="text-green-500"><?= $success ?></p>
   <?php endif; ?>

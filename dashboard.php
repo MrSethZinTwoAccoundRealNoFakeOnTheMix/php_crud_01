@@ -136,9 +136,10 @@ unset($_SESSION['success']);
     dateFormat: "Y-m-d",   // matches your database format
     defaultDate: "<?= htmlspecialchars($user_profile['dob']) ?>",
     });
-    const success = querySelector('.success').setTimeout(function(){
-      success.classList.add('hidden');
-    },3000);
+
+    setTimeout(() => {
+      const message = document.querySelector('.success').classList.add('hidden'); 
+    }, 3000);
     
   </script>
 </body>
