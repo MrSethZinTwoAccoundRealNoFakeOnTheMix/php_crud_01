@@ -21,6 +21,7 @@ if(empty($user_token)){
   exit;
 }
 
+
 require_once 'database.php';
 $user_id = $_SESSION['id'];
 $sql = "SELECT role,username,gmail,password,create_at,update_at FROM testdata_2 WHERE id = ?";
@@ -53,6 +54,10 @@ if($user_profile['role'] === 'admin'){
   $results_admin = $conn->query($sql_admin);
 
 }
+//-----retrive product data-----------
+$product_list = $conn->query("SELECT * FROM products_list");
+
+
 
 unset($_SESSION['success']);
 ?>
@@ -77,16 +82,26 @@ unset($_SESSION['success']);
       <div class="profile flex items-center">
         <p class="text-white hover:underline hover:text-amber-300 cursor-pointer">Account Role,   <?= $user_profile['role']; ?></p>
       </div>
+      <div class="viewCart flex items-center">
+        <p id="cartCount" class="cartCount absolute top-0 right-0 p-2 rounded-full bg-grey-500"></p>
+        <a href="add_to_card.php" class="px-4 py-2 bg-amber-300 border-transparent border-2 text-black font-semibold rounded-lg hover:bg-transparent hover:text-white hover:border-red-500 transition duration-300 ease-in-out cursor-pointer ">View Cart</a>
+      </div>
       <div class="logout flex items-center">
-        <a href="logout.php" class="px-4 py-2 bg-red-600 border-2 text-black font-semibold rounded-lg hover:bg-transparent hover:text-white hover:border-red-500 transition duration-300 ease-in-out cursor-pointer ">Logout</a>
+        <a href="logout.php" class="px-4 py-2 bg-red-600 border-transparent border-2 text-black font-semibold rounded-lg hover:bg-transparent hover:text-white hover:border-red-500 transition duration-300 ease-in-out cursor-pointer ">Logout</a>
       </div>
     </nav>
   </header>
+  <!-- ----------------aside dashboard navigation-------------- -->
   <aside class="fixed w-64 bg-slate-900 top-16 h-full p-4 flex flex-col space-y-2">
     <h1 class="text-amber-300 font-semibold text-xl mb-6">Dashboard</h1>
     <button class="dashboard_nav bg-slate-700 hover:bg-slate-700 rounded p-2 text-left cursor-pointer" >Home</button>
+    <button class="dashboard_nav hover:bg-slate-700 rounded p-2 text-left cursor-pointer" >Product</button>
     <button class="dashboard_nav hover:bg-slate-700 rounded p-2 text-left cursor-pointer" >Profile</button>
     <button class="dashboard_nav hover:bg-slate-700 rounded p-2 text-left cursor-pointer" >Setting</button>
+
+    <?php if($user_profile['role'] === 'admin'): ?>
+      <button class="dashboard_nav hover:bg-slate-700 rounded p-2 text-left cursor-pointer" >Add Products</button>
+    <?php endif; ?>
     <?php if($user_profile['role'] === 'admin'): ?>
       <button class="dashboard_nav hover:bg-slate-700 rounded p-2 text-left cursor-pointer" >All User Data</button>
     <?php endif; ?>
@@ -99,6 +114,57 @@ unset($_SESSION['success']);
     <div id="home" class="panel p-6 flex">
       <p for="home" class="flex flex-row text-center justify-center w-full mr-64">Welcome, <span class="text-amber-300 font-semibold"> <?= htmlspecialchars($user_profile['username']); ?></span></p>
     </div>
+    <!-- view product -->
+    <div id="product" class="panel p-6 hidden">
+      <div class="card-container flex flex-row flex-wrap gap-8 justify-center">
+        <?php if($product_list->num_rows > 0): ?>
+          <?php while($product = $product_list->fetch_assoc()): ?>
+
+            <div class="product-card w-64 bg-slate-600 shadow-xl rounded-lg overflow-hidden transition duration-300 hover:shadow-2xl">
+
+              <div class="img h-48 overflow-hidden">
+                <img src="<?= htmlspecialchars($product['image']); ?>" 
+                    alt="<?= htmlspecialchars($product['name']); ?>"
+                    class="w-full h-full object-cover">
+              </div>
+
+              <div class="text p-4">
+                <h1 class="productName font-bold text-xl text-amber-300 mb-1">
+                  <?= htmlspecialchars($product['name']); ?><?= htmlspecialchars($product['id']); ?>
+                </h1>
+                
+                <div class="flex justify-between items-center mt-2">
+                  <h3 class="productPrice text-2xl font-semibold text-green-500">
+                    $<?= htmlspecialchars($product['price']); ?>
+                  </h3>
+                  <p class="productQty text-sm text-white/80">
+                    In Stock: <?= htmlspecialchars($product['qty']); ?>
+                  </p>
+                </div>
+                
+                <!-- <form action="add_to_cart.php" method="post" class="mt-4">
+                  <input type="hidden" name="product_id" value="<?= htmlspecialchars($product['id']); ?>">
+                  <button type="submit" class="w-full bg-amber-300 text-black hover:text-white border-2 border-transparent hover:border-amber-300 py-2 rounded-md hover:bg-transparent transition duration-300 cursor-pointer">
+                    Add to Cart
+                  </button>
+                </form> -->
+
+                <!-- ------add to card button----- -->
+                <button type="submit" class="addToCardBtn w-full bg-amber-300 text-black hover:text-white border-2 border-transparent hover:border-amber-300 py-2 rounded-md hover:bg-transparent transition duration-300 cursor-pointer"
+                data-id = "<?= htmlspecialchars($product['id']); ?>">
+                    Add to Cart
+                </button>
+
+              </div>
+            </div>
+            <?php endwhile; ?>
+        <?php endif; ?>
+      </div>
+    </div>
+
+
+
+    <!-- profile -->
     <div id="profile" class="panel p-6 hidden ">
       <form action="update.php" method="post" class="flex flex-col gap-4 items-center w-full">
         <div class="flex flex-row gap-8 justify-between w-full">
@@ -131,6 +197,40 @@ unset($_SESSION['success']);
     <div id="setting" class="panel  p-6 hidden">
       setting
     </div>
+      <!-- --------Add product for admin--------- -->
+    <div id="addProduct" class="panel p-6 hidden">
+      <form action="product_process.php" method="POST" enctype="multipart/form-data" class="flex flex-col gap-4 items-center w-full ">
+
+        
+        <div class="flex flex-row gap-8 justify-between w-full">
+          <p class="px-12 py-2 w-64">Product Name: </p>
+          <input type="text" name="productName" class="border px-4 w-full" placeholder="Add Product Name"> 
+        </div>
+        <div class="flex flex-row gap-8 justify-between w-full">
+          <p class="px-12 py-2 w-64">Product Qty: </p>
+          <input type="text" name="productQty" class="border px-4 w-full" placeholder="Add Product Quantity"> 
+        </div>
+        <div class="flex flex-row gap-8 justify-between w-full">
+          <p class="px-12 py-2 w-64">Product Price: </p>
+          <input type="number" name="productPrice" class="border px-4 w-full" placeholder="Add Product Price"> 
+        </div>
+        <div class="flex flex-row gap-8 justify-between w-full">
+          <p class="px-12 py-2 w-64">Product Description: </p>
+          <input type="text" name="productDescription" class="border px-4 w-full" placeholder="Add Product Description"> 
+        </div>
+        <div class="flex flex-col items-center justify-center space-x-4 w-full">
+                <!-- 2. The Styled Label (the button) -->
+            <div class="flex items-center justify-center flex-row space-x-4">
+              <input type="file" name="image" id="image" class="px-4 py-2 rounded-lg bg-amber-300">
+
+            </div>
+                
+            </div>
+        <button type="submit" class="px-4 py-2 rounded-lg bg-amber-300 border-2 border-amber-300 text-black hover:text-white hover:bg-transparent transition duration-300 ease-in-out cursor-pointer">Upload</button>
+      </form>
+
+    </div>
+
     <!-- --------------data table for admin role--------------- -->
     <div id="dataTable" class="panel ml-32 p-6 hidden">
       <?php if(!empty($success)): ?>
@@ -175,41 +275,42 @@ unset($_SESSION['success']);
     <?php endif; ?>
   </table>
       <a href="index.php" class=" px-4 py-2 rounded-lg bg-amber-300 border-2 border-amber-300 text-black hover:text-white hover:bg-transparent transition duration-300 ease-in-out cursor-pointer">Back</a>
-  <!-- ----------------------------------Edit form ------------------------------>
-  <div class="overlay hidden h-screen w-screen bg-black/30 fixed top-0 items-center justify-center">
-    <form action="action.php" method="post" class="editForm absolute p-8 bg-slate-600 w-[400px] min-h-[400px] flex flex-col  items-center rounded-xl z-20 ">
-      <h1 class="text-white text-lg ">Edit item</h1>
-      <div class="text-white mt-4 w-full flex justify-between items-center">
-        <label for="name">Username:</label>
-        <input type="text" name="username" id="editUsername" class="border rounded-lg px-4 py-2" placeholder="Username">
+    <!-- ----------------------------------Edit form ------------------------------>
+    <div class="overlay hidden h-screen w-screen bg-black/30 fixed top-0 items-center justify-center">
+      <form action="action.php" method="post" class="editForm absolute p-8 bg-slate-600 w-[400px] min-h-[400px] flex flex-col  items-center rounded-xl z-20 ">
+        <h1 class="text-white text-lg ">Edit item</h1>
+        <div class="text-white mt-4 w-full flex justify-between items-center">
+          <label for="name">Username:</label>
+          <input type="text" name="username" id="editUsername" class="border rounded-lg px-4 py-2" placeholder="Username">
+        </div>
+        <div class="text-white mt-4 w-full flex justify-between items-center">
+          <label for="name">Gmail:</label>
+          <input type="text" name="gmail" id="editGmail" class="border rounded-lg px-4 py-2" placeholder="Gmail">
+        </div>
+        <div class="text-white mt-4 w-full flex justify-between items-center">
+          <label for="password">Old Password:</label>
+          <input type="text" name="old_password" class="border rounded-lg px-4 py-2" placeholder="Password">
+        </div>
+        <div class="text-white mt-4 w-full flex justify-between items-center">
+          <label for="name">New Password:</label>
+          <input type="text" name="new_password" class="border rounded-lg px-4 py-2" placeholder="Password">
+        </div>
+        <div class="text-white mt-4 w-full flex justify-between items-center">
+        <label for="role">Role:</label>
+        <select name="role" id="role" class="border px-12 py-2 rounded-md">
+          <option value="user" class="bg-slate-800 text-white hover:bg-slate-600" >User</option>
+          <option value="admin" class="bg-slate-800 text-white hover:bg-slate-600" >Admin</option>
+        </select>
       </div>
-      <div class="text-white mt-4 w-full flex justify-between items-center">
-        <label for="name">Gmail:</label>
-        <input type="text" name="gmail" id="editGmail" class="border rounded-lg px-4 py-2" placeholder="Gmail">
-      </div>
-      <div class="text-white mt-4 w-full flex justify-between items-center">
-        <label for="password">Old Password:</label>
-        <input type="text" name="old_password" class="border rounded-lg px-4 py-2" placeholder="Password">
-      </div>
-      <div class="text-white mt-4 w-full flex justify-between items-center">
-        <label for="name">New Password:</label>
-        <input type="text" name="new_password" class="border rounded-lg px-4 py-2" placeholder="Password">
-      </div>
-      <div class="text-white mt-4 w-full flex justify-between items-center">
-      <label for="role">Role:</label>
-      <select name="role" id="role" class="border px-12 py-2 rounded-md">
-        <option value="user" class="bg-slate-800 text-white hover:bg-slate-600" >User</option>
-        <option value="admin" class="bg-slate-800 text-white hover:bg-slate-600" >Admin</option>
-      </select>
+        <div class="text-white mt-4 w-full flex justify-between items-center">
+          <button class="backBtn px-4 py-2 rounded-lg bg-amber-300 border-2 border-amber-300 text-black hover:text-white hover:bg-transparent transition duration-300 ease-in-out cursor-pointer">Back</button>
+          <input class="px-4 py-2 rounded-lg bg-amber-300 border-2 border-amber-300 text-black hover:text-white hover:bg-transparent transition duration-300 ease-in-out cursor-pointer" type="submit" name="actions" value="Save Edit">
+        </div>
+        <input type="hidden" name="getId" id="getId">
+      </form>
+        
     </div>
-      <div class="text-white mt-4 w-full flex justify-between items-center">
-        <button class="backBtn px-4 py-2 rounded-lg bg-amber-300 border-2 border-amber-300 text-black hover:text-white hover:bg-transparent transition duration-300 ease-in-out cursor-pointer">Back</button>
-        <input class="px-4 py-2 rounded-lg bg-amber-300 border-2 border-amber-300 text-black hover:text-white hover:bg-transparent transition duration-300 ease-in-out cursor-pointer" type="submit" name="actions" value="Save Edit">
-      </div>
-      <input type="hidden" name="getId" id="getId">
-    </form>
-      
-  </div>
+    
     </div>
   </main>
   <script>
@@ -256,6 +357,45 @@ unset($_SESSION['success']);
     backBtn.addEventListener('click', (e) =>{
       e.preventDefault();
       overlay.classList.add('hidden');
+    });
+
+    //-----image upload style---------
+    document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('file-upload');
+            const fileNameDisplay = document.getElementById('file-name');
+
+            fileInput.addEventListener('change', function() {
+                if (fileInput.files.length > 0) {
+                    fileNameDisplay.textContent = fileInput.files[0].name;
+                    fileNameDisplay.classList.remove('text-gray-500', 'italic');
+                    fileNameDisplay.classList.add('text-gray-800', 'font-medium');
+                } else {
+                    fileNameDisplay.textContent = 'No file selected';
+                    fileNameDisplay.classList.remove('text-gray-800', 'font-medium');
+                    fileNameDisplay.classList.add('text-gray-500', 'italic');
+                }
+            });
+        });
+
+
+
+    //----------add to card button-----
+    document.querySelectorAll('.addToCardBtn').forEach(btn =>{
+      btn.addEventListener('click', async () =>{
+        const product_id  = btn.dataset.id;
+
+        const formData = new FormData();
+        formData.append('id', product_id);
+        
+        const res = await fetch('add_to_card.php', {
+          method: 'POST',
+          body: formData
+        });
+        const cartCount = await res.text();
+
+        console.log(cartCount);
+        document.getElementById('cartCount').innerHTML = cartCount;
+      });
     });
   </script>
 </body>
