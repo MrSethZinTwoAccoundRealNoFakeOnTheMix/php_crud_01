@@ -74,10 +74,10 @@ require_once "database.php";
                   <button class="minus px-2 font-bold text-xl rounded-full border border-slate-300 cursor-pointer">-</button>
                   <input type="number" name="qty" class="max-w-16 text-center border border-slate-300" id="product_qty" value="1">
                   <button class="plus px-2 font-bold text-xl rounded-full border border-slate-300 cursor-pointer">+</button>
-               </div>
+               </div> 
                <!-- price display  -->
                 <div class="price flex justify-center items-center">
-                  <p class="font-semibold text-center">123$</p>
+                  <p class="font-semibold text-center">12332$</p>
                 </div>
                 <!-- delete product  -->
                  <div class="delete flex justify-center items-center">
