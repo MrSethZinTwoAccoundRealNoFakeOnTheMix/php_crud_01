@@ -56,7 +56,7 @@ if($user_profile['role'] === 'admin'){
 }
 //-----retrive product data-----------
 $product_list = $conn->query("SELECT * FROM products_list");
-
+$cart_count = $_SESSION['cart_count'] ?? '';
 
 
 unset($_SESSION['success']);
@@ -82,9 +82,12 @@ unset($_SESSION['success']);
       <div class="profile flex items-center">
         <p class="text-white hover:underline hover:text-amber-300 cursor-pointer">Account Role,   <?= $user_profile['role']; ?></p>
       </div>
-      <div class="viewCart flex items-center">
-        <p id="cartCount" class="cartCount absolute top-0 right-0 p-2 rounded-full bg-grey-500"></p>
-        <a href="add_to_card.php" class="px-4 py-2 bg-amber-300 border-transparent border-2 text-black font-semibold rounded-lg hover:bg-transparent hover:text-white hover:border-red-500 transition duration-300 ease-in-out cursor-pointer ">View Cart</a>
+      <!-- add product message appear on view cart  -->
+      <div class="viewCart flex items-center relative">
+        <?php if($cart_count > 0): ?>
+        <p id="cartCount" class="cartCount absolute -bottom-5 -right-2 p-1 rounded-full bg-gray-500"><?= htmlspecialchars($cart_count) ?></p>
+        <?php endif; ?>
+        <a href="view_cart.php" class="px-4 py-2 bg-amber-300 border-transparent border-2 text-black font-semibold rounded-lg hover:bg-transparent hover:text-white hover:border-red-500 transition duration-300 ease-in-out cursor-pointer ">View Cart</a>
       </div>
       <div class="logout flex items-center">
         <a href="logout.php" class="px-4 py-2 bg-red-600 border-transparent border-2 text-black font-semibold rounded-lg hover:bg-transparent hover:text-white hover:border-red-500 transition duration-300 ease-in-out cursor-pointer ">Logout</a>
@@ -119,7 +122,7 @@ unset($_SESSION['success']);
       <div class="card-container flex flex-row flex-wrap gap-8 justify-center">
         <?php if($product_list->num_rows > 0): ?>
           <?php while($product = $product_list->fetch_assoc()): ?>
-
+            <!-- product card for display and buy -->
             <div class="product-card w-64 bg-slate-600 shadow-xl rounded-lg overflow-hidden transition duration-300 hover:shadow-2xl">
 
               <div class="img h-48 overflow-hidden">
@@ -151,10 +154,16 @@ unset($_SESSION['success']);
 
                 <!-- ------add to card button----- -->
                 <button type="submit" class="addToCardBtn w-full bg-amber-300 text-black hover:text-white border-2 border-transparent hover:border-amber-300 py-2 rounded-md hover:bg-transparent transition duration-300 cursor-pointer"
-                data-id = "<?= htmlspecialchars($product['id']); ?>">
+                data-id = "<?= htmlspecialchars($product['id']); ?>"
+                data-qty = "<?= htmlspecialchars($product['qty']); ?>">
                     Add to Cart
                 </button>
-
+                <!-- qty controller -->
+                 <div class="qtyControl hidden mt-4 items-center justify-between  p-2 rounded-md">
+                  <button class="minus px-4 py-2 text-2xl font-bold rounded-full bg-amber-300 hover:bg-amber-500 cursor-pointer">-</button>
+                  <input class="qtyValue bg-slate-700 items-center px-4 py-2 max-w-20" type="text" value="<?= htmlspecialchars($product['qty']); ?>"></input>
+                  <button class="plus px-4 py-2 text-2xl font-bold rounded-full bg-amber-300 hover:bg-amber-500 cursor-pointer">+</button>
+                 </div>
               </div>
             </div>
             <?php endwhile; ?>
@@ -376,6 +385,54 @@ unset($_SESSION['success']);
                 }
             });
         });
+
+    // document.querySelectorAll(".product-card").forEach(card => {
+    //   const addBtn = card.querySelector(".addToCardBtn");
+    //   const qtyBox = card.querySelector(".qtyControl");
+    //   const qtyValue = card.querySelector(".qtyValue");
+    //   const minusBtn = card.querySelector(".minus");
+    //   const plusBtn = card.querySelector(".plus");
+
+    //   addBtn.addEventListener("click", () => {
+    //       addBtn.classList.add("hidden");
+    //       qtyValue.textContent = 1;
+    //       qtyBox.classList.remove("hidden");
+    //   });
+
+    //   plusBtn.addEventListener("click", () => {
+    //       let q = parseInt(qtyValue.textContent);
+    //       qtyValue.textContent = q + 1;
+    //   });
+
+    //   minusBtn.addEventListener("click", () => {
+    //       let q = parseInt(qtyValue.textContent);
+    //       if (q > 1) {
+    //           qtyValue.textContent = q - 1;
+    //       } else {
+    //           // qty becomes 0 → revert back to Add to Cart
+    //           qtyBox.classList.add("hidden");
+    //           addBtn.classList.remove("hidden");
+    //       }
+    //   });
+    //     addBtn.forEach(btn =>{
+    //       btn.addEventListener('click', async () =>{
+    //       const product_id  = btn.dataset.id;
+
+    //       const formData = new FormData();
+    //       formData.append('id', product_id);
+          
+    //       const res = await fetch('add_to_card.php', {
+    //         method: 'POST',
+    //         body: formData
+    //       });
+    //       const cartCount = await res.text();
+
+    //       console.log(cartCount);
+    //       document.getElementById('cartCount').innerHTML = cartCount;
+    //       });
+    //     });
+
+    // });
 
 
 
